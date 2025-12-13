@@ -10,6 +10,7 @@ interface Post {
   title: string;
   content: string;
   published: boolean;
+  fileUrl?: string;
   createdAt: string;
   author: {
     name: string;
