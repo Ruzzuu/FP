@@ -1,55 +1,38 @@
-# Multi-stage build for optimized production image
-FROM node:18-alpine AS builder
-
-# Install OpenSSL 3.x for Prisma
-RUN apk update && apk add --no-cache openssl
+# Build stage
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm ci
+# Add npm config for faster install
+RUN npm config set fetch-timeout 60000 && \
+    npm config set fetch-retries 5 && \
+    npm ci
 
-# Copy source code
-COPY . .
-
-# Generate Prisma Client with binary targets
 RUN npx prisma generate
 
-# Build application
+COPY . .
+
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:20-slim AS production
 
-# Install OpenSSL 3.x for Prisma runtime
-RUN apk update && apk add --no-cache openssl
+RUN apt-get update -y && \
+    apt-get install -y openssl wget && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install production dependencies only
-RUN npm ci --only=production
-
-# Copy built application from builder
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Create uploads directory
-RUN mkdir -p /app/uploads
+RUN mkdir -p /app/uploads /app/database
 
-# Expose port
 EXPOSE 5000
 
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=5000
-
-# Run migrations and start application
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main.js"]

@@ -1,5 +1,4 @@
 services:
-  # PostgreSQL Database
   postgres:
     image: postgres:18-alpine
     container_name: fp-postgres
@@ -58,8 +57,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
-  # Frontend (Next.js)
   frontend:
     build:
       context: ./frontend
@@ -81,6 +80,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
 networks:
   fp-network:
