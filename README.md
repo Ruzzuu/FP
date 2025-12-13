@@ -1,0 +1,51 @@
+﻿# Forum & Blog Platform
+
+Simple forum and blog application with authentication, posts, and reply system.
+
+## Tech Stack
+
+**Backend:** NestJS, Prisma, SQLite, JWT  
+**Frontend:** Next.js, React, Tailwind CSS
+
+## Features
+
+- User authentication (register/login)
+- Create, edit, delete posts
+- Reply to posts with author tracking
+- Image upload support
+- Protected routes
+
+## Quick Start
+
+### Backend
+```bash
+cd backend
+npm install
+npx prisma generate
+npx prisma migrate dev
+npm run start:dev
+```
+
+Backend runs on: http://localhost:3000
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs on: http://localhost:3001
+
+## API Endpoints
+
+- `POST /auth/register` - Register new user
+- `POST /auth/login` - Login user
+- `GET /posts` - Get all posts
+- `POST /posts` - Create new post
+- `POST /posts/:id/reply` - Add reply to post
+- `DELETE /posts/:postId/reply/:replyId` - Delete own reply
+
+## Database
+
+SQLite database located at `backend/prisma/dev.db`
