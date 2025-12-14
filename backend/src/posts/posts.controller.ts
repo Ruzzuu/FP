@@ -54,7 +54,13 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    const fileUrl = file ? `/uploads/${file.filename}` : undefined;
+    // Build full URL for uploaded file using request host
+    let fileUrl = undefined;
+    if (file) {
+      const protocol = req.protocol || 'http';
+      const host = req.get('host') || 'localhost:5000';
+      fileUrl = `${protocol}://${host}/uploads/${file.filename}`;
+    }
     return this.postsService.create(req.user.userId, { ...createPostDto, fileUrl });
   }
 
