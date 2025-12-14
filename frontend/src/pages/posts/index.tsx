@@ -103,16 +103,25 @@ const PostsList: React.FC = () => {
                     onClick={() => router.push(`/posts/${post.id}`)}
                   >
                     <div className="flex gap-4">
-                      {post.fileUrl && post.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i) && (
+                      {post.fileUrl && (
                         <div className="flex-shrink-0">
-                          <img
-                            src={post.fileUrl}
-                            alt={post.title}
-                            className="w-32 h-32 object-cover rounded-lg"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
-                          />
+                          {post.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                            <img
+                              src={post.fileUrl}
+                              alt={post.title}
+                              className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                              onError={(e) => {
+                                // Show placeholder on error
+                                e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="128"%3E%3Crect fill="%23f3f4f6" width="128" height="128"/%3E%3Ctext fill="%23999" font-size="14" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          )}
                         </div>
                       )}
                       <div className="flex-1">
