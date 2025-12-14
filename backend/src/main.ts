@@ -13,10 +13,28 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  // Enable CORS for localhost development
+  // Enable CORS for localhost development, Docker networks, and Azure
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001',
+      'http://localhost:80',
+      'http://127.0.0.1:80',
+      'http://frontend:3000',
+      // Azure VM
+      'http://20.2.83.176',
+      'http://20.2.83.176:80',
+      'http://20.2.83.176:3000',
+      'http://20.2.83.176:3001',
+      // Docker networks
+      /^http:\/\/172\.\d+\.\d+\.\d+:3000$/,
+      /^http:\/\/(\w+\.)?localhost:300[01]$/,
+    ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   // Global validation pipe
