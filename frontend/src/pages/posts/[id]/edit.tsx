@@ -20,6 +20,8 @@ const EditPost: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [published, setPublished] = useState(true);
+  const [file, setFile] = useState<File | null>(null);
+  const [currentFileUrl, setCurrentFileUrl] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -46,6 +48,7 @@ const EditPost: React.FC = () => {
       setTitle(post.title || '');
       setContent(post.content || '');
       setPublished(post.published ?? true);
+      setCurrentFileUrl((post as any).fileUrl || '');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load post');
       setTimeout(() => router.push('/posts'), 2000);
@@ -60,16 +63,30 @@ const EditPost: React.FC = () => {
     setSubmitting(true);
 
     try {
-      await api.patch(`/posts/${id}`, {
-        title,
-        content,
-        published,
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('published', String(published));
+      if (file) {
+        formData.append('file', file);
+      }
+
+      await api.patch(`/posts/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       router.push(`/posts/${id}`);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update post');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
     }
   };
 
@@ -122,6 +139,35 @@ const EditPost: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="file" className="block text-gray-700 text-sm font-bold mb-2">
+                Attachment (optional)
+              </label>
+              {currentFileUrl && !file && (
+                <div className="mb-2">
+                  <p className="text-sm text-gray-600 mb-1">Current file:</p>
+                  <a
+                    href={currentFileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-700 text-sm"
+                  >
+                    View current attachment
+                  </a>
+                </div>
+              )}
+              <input
+                type="file"
+                id="file"
+                onChange={handleFileChange}
+                accept="image/*,.pdf,.txt"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {file && (
+                <p className="text-sm text-gray-600 mt-1">New file: {file.name}</p>
+              )}
             </div>
 
             <div className="mb-6">

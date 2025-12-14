@@ -80,12 +80,42 @@ export class PostsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB limit
+      },
+      fileFilter: (req, file, cb) => {
+        const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain'];
+        if (allowedMimes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(new Error('Invalid file type. Only JPEG, PNG, GIF, PDF, and TXT files are allowed.'), false);
+        }
+      },
+    }),
+  )
   update(
     @Param('id') id: string,
     @Request() req,
     @Body() updatePostDto: UpdatePostDto,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.postsService.update(id, req.user.userId, updatePostDto);
+    // Build full URL for uploaded file using request host
+    let fileUrl = undefined;
+    if (file) {
+      const protocol = req.protocol || 'http';
+      const host = req.get('host') || 'localhost:5000';
+      fileUrl = `${protocol}://${host}/uploads/${file.filename}`;
+    }
+    return this.postsService.update(id, req.user.userId, { ...updatePostDto, fileUrl });
   }
 
   @Delete(':id')

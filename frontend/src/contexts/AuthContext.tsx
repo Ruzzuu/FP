@@ -103,7 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       setUser(null);
-      router.push('/login');
+      // Use replace to avoid "Abort fetching component" error
+      router.replace('/login');
     }
   };
 
