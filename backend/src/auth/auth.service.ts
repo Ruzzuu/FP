@@ -45,8 +45,12 @@ export class AuthService {
       // Save refresh token
       await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-      // Send welcome email (async, don't wait)
-      this.mailService.sendWelcomeEmail(user.email, user.name);
+      // Send welcome email (async, don't wait, ignore errors)
+      try {
+        this.mailService.sendWelcomeEmail(user.email, user.name).catch(() => {});
+      } catch (error) {
+        // Ignore email errors
+      }
 
       return {
         user: {
