@@ -54,12 +54,11 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    // Build full URL for uploaded file using request host
+    // Build full URL for uploaded file using BASE_URL env or fallback to request host
     let fileUrl = undefined;
     if (file) {
-      const protocol = req.protocol || 'http';
-      const host = req.get('host') || 'localhost:5000';
-      fileUrl = `${protocol}://${host}/uploads/${file.filename}`;
+      const baseUrl = process.env.BASE_URL || `${req.protocol || 'http'}://${req.get('host') || 'localhost:5000'}`;
+      fileUrl = `${baseUrl}/uploads/${file.filename}`;
     }
     return this.postsService.create(req.user.userId, { ...createPostDto, fileUrl });
   }
@@ -108,12 +107,11 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    // Build full URL for uploaded file using request host
+    // Build full URL for uploaded file using BASE_URL env or fallback to request host
     let fileUrl = undefined;
     if (file) {
-      const protocol = req.protocol || 'http';
-      const host = req.get('host') || 'localhost:5000';
-      fileUrl = `${protocol}://${host}/uploads/${file.filename}`;
+      const baseUrl = process.env.BASE_URL || `${req.protocol || 'http'}://${req.get('host') || 'localhost:5000'}`;
+      fileUrl = `${baseUrl}/uploads/${file.filename}`;
     }
     return this.postsService.update(id, req.user.userId, { ...updatePostDto, fileUrl });
   }

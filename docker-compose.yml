@@ -38,6 +38,7 @@ services:
       # Application
       NODE_ENV: production
       PORT: 5000
+      BASE_URL: ${BASE_URL:-http://localhost:5001}
       # Mail (optional - configure if needed)
       MAIL_HOST: smtp.example.com
       MAIL_PORT: 587
