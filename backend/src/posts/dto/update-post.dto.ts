@@ -18,4 +18,8 @@ export class UpdatePostDto {
   @IsBoolean()
   @IsOptional()
   published?: boolean;
+
+  @IsString()
+  @IsOptional()
+  fileUrl?: string;
 }
