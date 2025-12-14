@@ -106,7 +106,7 @@ const PostsList: React.FC = () => {
                       {post.fileUrl && post.fileUrl.match(/\.(jpg|jpeg|png|gif)$/i) && (
                         <div className="flex-shrink-0">
                           <img
-                            src={`http://localhost:5000${post.fileUrl}`}
+                            src={post.fileUrl}
                             alt={post.title}
                             className="w-32 h-32 object-cover rounded-lg"
                             onError={(e) => {
@@ -139,7 +139,15 @@ const PostsList: React.FC = () => {
                           {post.fileUrl && (
                             <>
                               <span className="mx-2">•</span>
-                              <span className="text-blue-600">📎 Has attachment</span>
+                              <a
+                                href={post.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                📎 Has attachment
+                              </a>
                             </>
                           )}
                         </div>
